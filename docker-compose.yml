@@ -1,0 +1,19 @@
+services:
+  eda:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.data
+    image: bdd-eda:latest
+    ports:
+      - "8501:8501"
+    environment:
+      BDD_IMG_ROOT: /data/images
+      BDD_LABELS_DIR: /data/labels
+      ST_PORT: "8501"
+      SKIP_INGEST: "0"    # set to "1" to reuse existing parquet
+    volumes:
+      # mount your local dataset (read-only)
+      - ./assignment_data_bdd/bdd100k_images_100k/bdd100k/images/100k:/data/images:ro
+      - ./assignment_data_bdd/bdd100k_labels_release/bdd100k/labels:/data/labels:ro
+      # persist generated parquet/exports
+      - ./reports:/app/reports

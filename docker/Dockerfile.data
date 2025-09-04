@@ -1,0 +1,35 @@
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Python deps
+COPY requirements/data.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# App code
+COPY src /app/src
+COPY scripts /app/scripts
+COPY reports /app/reports
+
+# Default data mount points inside the container
+ENV BDD_IMG_ROOT=/data/images \
+    BDD_LABELS_DIR=/data/labels \
+    TRAIN_JSON=bdd100k_labels_images_train.json \
+    VAL_JSON=bdd100k_labels_images_val.json \
+    SKIP_INGEST=0
+
+EXPOSE 8501
+
+# Run
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+EXPOSE 8501
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

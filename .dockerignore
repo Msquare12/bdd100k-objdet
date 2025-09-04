@@ -1,0 +1,11 @@
+# big local data
+assignment_data_bdd/
+bdd100k_images_100k/
+bdd100k_labels_release/
+
+# caches & misc
+**/__pycache__/
+*.pyc
+.env
+.venv
+.git

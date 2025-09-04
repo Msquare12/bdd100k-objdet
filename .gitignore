@@ -1,0 +1,25 @@
+cat > .gitignore << 'EOF'
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Local data (keep out of git)
+assignment_data_bdd/
+bdd100k_images_100k/
+bdd100k_labels_release/
+
+# Generated heavy artifacts
+reports/eda/annotations.parquet
+reports/eda/images_index.parquet
+reports/eda/exports/
+
+# model/eval outputs
+reports/model/
+reports/eval/
+runs/                 # ultralytics default
+weights/
+checkpoints/
+
+EOF

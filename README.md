@@ -70,12 +70,6 @@ SKIP_INGEST=1 docker compose up eda
 
 ## Dashboard — Screenshots
 
-<p float="left">
-  <img src="reports/eda/assets/dash1.png" width="32%" />
-  <img src="reports/eda/assets/dash2.png" width="32%" />
-  <img src="reports/eda/assets/dash3.png" width="32%" />
-</p>
-
 ![EDA Overview](reports/eda/assets/dash1.png)
 ![View overlayed images](reports/eda/assets/dash2.png)
 ![Interesting Samples](reports/eda/assets/dash3.png)

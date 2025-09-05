@@ -62,8 +62,8 @@ docker compose up eda      # open http://localhost:8501
 SKIP_INGEST=1 docker compose up eda
 ```
 
-* Details: **docker/README.md**
-* My Insights write-up: **reports/eda/INSIGHTS.md**
+* Details: [docker/README.md](docker/README.md)
+* My Insights write-up: Details: [reports/eda/INSIGHTS.md](reports/eda/INSIGHTS.md)
 
 
 ---
@@ -78,7 +78,9 @@ SKIP_INGEST=1 docker compose up eda
 
 ## Part 2 - Model Training (YOLOv8)
 
-* Docs: **reports/model/MODEL.md** (Reason to choose & architecture etc), **reports/model/TRAINING.md** (how to train)
+* Docs:
+    - [reports/model/MODEL.md](reports/model/MODEL.md) (Reason to choose & architecture etc)
+    - [reports/model/TRAINING.md](reports/model/TRAINING.md) (how to train)
 
 ### Minimal workflow
 
@@ -104,7 +106,7 @@ bash scripts/run_train_subset.sh    # uses yolov8s.pt, imgsz=1280, 1 epoch
 
 ## Part 3 - Evaluation & Visualization
 
-* Docs: **reports/eval/EVAL.md**
+* Docs: [reports/eval/EVAL.md](reports/eval/EVAL.md)
 
 ```bash
 # 1) Save YOLO val predictions + plots

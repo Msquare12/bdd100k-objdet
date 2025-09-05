@@ -62,8 +62,8 @@ docker compose up eda      # open http://localhost:8501
 SKIP_INGEST=1 docker compose up eda
 ```
 
-* Details: **docker/README.md**
-* My Insights write-up: **reports/eda/INSIGHTS.md**
+* Details: ![](docker/README.md) **docker/README.md**
+* My data analysis write-up: **reports/eda/INSIGHTS.md**
 
 
 ---

@@ -12,7 +12,14 @@ End-to-end project on BDD100K:
 ## Repository Layout
 
 ```
-docker/                      # Dockerfile + compose entrypoint for EDA
+configs/
+  data_bdd_yolo.yaml         # YOLO data cfg (full)
+  data_bdd_yolo_subset.yaml  # YOLO data cfg (subset)
+docker/                      # Dockerfile + compose entrypoint for EDA + README.md
+reports/
+  eda/                       # EDA analysis docs
+  eval/                      # Model Evaluation analysis docs
+  model/                     # Model Training analysis docs
 requirements/
   data.txt                   # EDA deps
   model.txt                  # training/eval deps (torch, ultralytics etc)
@@ -20,7 +27,8 @@ scripts/
   run_data_ingest.sh         # JSON → parquet
   run_streamlit.sh           # local Streamlit
   make_subset.py             # build YOLO subset (copy/symlink)
-  run_train_subset.sh        # 1-epoch sanity training
+  run_train_subset.sh        # 1-epoch subset sanity training
+  run_train.sh               # full data training
   run_eval.sh                # save val predictions + plots
 src/
   data/
@@ -32,26 +40,14 @@ src/
   vis/
     streamlit_app.py         # EDA dashboard
     overlay_pred_gt.py       # GT vs Pred overlays
-configs/
-  data_bdd_yolo.yaml         # YOLO data cfg (full)
-  data_bdd_yolo_subset.yaml  # YOLO data cfg (subset)
-reports/
-  eda/
-    INSIGHTS.md              # data analysis notes + figures
-    assets/, insights/       # screenshots & CSVs
-  model/
-    MODEL.md                 # model choice & reasoning
-    TRAINING.md              # how to train
-  eval/
-    EVAL.md                  # evaluation & visualization notes
-runs/                        # training/eval outputs (gitignored)
+docker-compose.yml           # dokcer compose file for data analysis part
 ```
 
 *(Heavy data is gitignored; mount via Docker or use absolute paths.)*
 
 ---
 
-## Quick Start — Part 1: Data Analysis (Docker)
+## Quick Start - Part 1: Data Analysis (Docker)
 
 Use the containerized dashboard; dataset is mounted from host.
 
@@ -72,7 +68,21 @@ SKIP_INGEST=1 docker compose up eda
 
 ---
 
-## Part 2 — Model Training (YOLOv8)
+## Dashboard — Screenshots
+
+<p float="left">
+  <img src="reports/eda/assets/dash1.png" width="32%" />
+  <img src="reports/eda/assets/dash2.png" width="32%" />
+  <img src="reports/eda/assets/dash3.png" width="32%" />
+</p>
+
+![EDA Overview](reports/eda/assets/dash1.png)
+![View overlayed images](reports/eda/assets/dash2.png)
+![Interesting Samples](reports/eda/assets/dash3.png)
+
+---
+
+## Part 2 - Model Training (YOLOv8)
 
 * Docs: **reports/model/MODEL.md** (Reason to choose & architecture etc), **reports/model/TRAINING.md** (how to train)
 
@@ -98,7 +108,7 @@ bash scripts/run_train_subset.sh    # uses yolov8s.pt, imgsz=1280, 1 epoch
 
 ---
 
-## Part 3 — Evaluation & Visualization
+## Part 3 - Evaluation & Visualization
 
 * Docs: **reports/eval/EVAL.md**
 

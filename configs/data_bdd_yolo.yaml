@@ -1,4 +1,4 @@
-# for full training
+# for full dataset training
 path: /media/hugeDrive1/Malyaj/SD_gujarati_OCR/adas_bdd/data/yolo_bdd
 train: images/train
 val: images/val

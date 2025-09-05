@@ -37,13 +37,13 @@ One apparent outlier is class **`train`** (small_rate Δ≈+29.4%, occluded Δ�
 
 **Why it matters:** With no substantive drift, we don’t expect split-induced shifts to dominate evaluation. Any performance gaps are more likely due to inherent task difficulty (e.g., tiny traffic lights) rather than distribution mismatch.
 
-**Action.**
+**Action:**
 - Report **per-class AP with support**; flag classes with low counts (e.g., `train`) as **low-confidence**.
 - Optional: use **micro + macro** metrics in the eval section to show robustness to the long-tail.
 - Keep attention on **tiny-object handling** and **qualitative failure modes**.
 
 
-**How to reproduce above outputs in the app.**
+**How to reproduce above outputs in the app:**
 1. Open Streamlit (`./scripts/run_streamlit.sh`), go to **Train vs Val** tab.
 2. Clear special filters (keep all splits/categories).
 3. Review the **Counts by class & split** chart and the **delta table**.  
@@ -59,14 +59,14 @@ One apparent outlier is class **`train`** (small_rate Δ≈+29.4%, occluded Δ�
 ![](assets/area_norm_hist_traffic_light.png)
 
 
-**Insight.** `traffic light` is overwhelmingly tiny — **88.3% small** (median **262 px² ≈ 0.03%** of a 1280×720 frame). `traffic sign` is also small-object heavy — **74.9% small** (median **444 px² ≈ 0.05%**). Split deltas are negligible → this is a **core tiny-object challenge**, not a train/val mismatch.
+**Insight:** `traffic light` is overwhelmingly tiny — **88.3% small** (median **262 px² ≈ 0.03%** of a 1280×720 frame). `traffic sign` is also small-object heavy — **74.9% small** (median **444 px² ≈ 0.05%**). Split deltas are negligible → this is a **core tiny-object challenge**, not a train/val mismatch.
 
-**Impact.** Train/eval with higher input res (≥ **960**), use small-object augs (mosaic/copy-paste), verify **stride-8** coverage/anchors, and track **AP_small** for lights/signs.
+**Impact:** Train/eval with higher input res (≥ **960**), use small-object augs (mosaic/copy-paste), verify **stride-8** coverage/anchors, and track **AP_small** for lights/signs.
 
-*YOLOv8 tiny-object preset:* `imgsz=1280 mosaic=1.0 copy_paste=0.5 mixup=0.0 scale=0.5 translate=0.1 fliplr=0.5 flipud=0.0` (track **AP_small** for lights/signs).
+*YOLOv8 tiny-object preset(We will use parameter values on similar lines to tackle tiny objects while training):* `imgsz=1280 mosaic=1.0 copy_paste=0.5 mixup=0.0 scale=0.5 translate=0.1 fliplr=0.5 flipud=0.0` (track **AP_small** for lights/signs).
 
 
-Some examples of Tiny lights and signs:
+**Some examples of Tiny lights and signs:**
 ![](assets/tiny_lights_1.jpg)
 ![](assets/tiny_lights_2.jpg)
 
@@ -99,7 +99,7 @@ Track AP/Recall on **occluded=true** and **edge_touch=true** slices; keep **NMS 
 ![](assets/crowded_1.jpg) ![](assets/crowded_2.jpg)  
 CSV: [`reports/eda/insights/crowded.csv`](insights/crowded.csv)
 
-**Tiny traffic lights** — (examples given above) extreme small objects; expect precision/recall drops.  
+**Tiny traffic lights** — (examples given above as well) extreme small objects; expect precision/recall drops.  
 ![](assets/tiny_lights_1.jpg) ![](assets/tiny_lights_2.jpg)  
 CSV: [`reports/eda/insights/tiny_traffic_lights.csv`](insights/tiny_traffic_lights.csv)
 
@@ -115,14 +115,14 @@ CSV: [`reports/eda/insights/occluded_cars_night.csv`](insights/occluded_cars_nig
 ![](assets/border_truncated_1.jpg) ![](assets/border_truncated_2.jpg)  
 CSV: [`reports/eda/insights/border_truncated.csv`](insights/border_truncated.csv)
 
-**Impact on Object Detection Training:**  
+**Special steps to be taken during Object Detection Training:**  
 - Use **imgsz ≥ 960–1280**, `mosaic=1.0`, `copy_paste=0.5`; enable **stride-8** coverage.  
 - Monitor **AP_small**, **Recall** on `occluded=true` and `edge_touch=true` subsets.  
 - Review failures from these buckets post-eval; adjust **conf/NMS IoU** and augs accordingly.
 
 ---
 
-## Appendix — How to run the dashboard
+## Appendix — How to run the dashboard and visualise above insights:
 
 ```bash
 pip install -r requirements/data.txt

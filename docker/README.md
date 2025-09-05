@@ -1,4 +1,4 @@
-# BDD100K Data Analysis – Docker (Compose)
+# BDD100K Data Analysis – Docker Container
 
 Runs the Streamlit EDA app in a self-contained container.  
 Dataset is **mounted** (not baked into the image).

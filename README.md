@@ -63,7 +63,7 @@ SKIP_INGEST=1 docker compose up eda
 ```
 
 * Details: [docker/README.md](docker/README.md)
-* My Insights write-up: Details: [reports/eda/INSIGHTS.md](reports/eda/INSIGHTS.md)
+* My Data Analysis Insights: [reports/eda/INSIGHTS.md](reports/eda/INSIGHTS.md)
 
 
 ---

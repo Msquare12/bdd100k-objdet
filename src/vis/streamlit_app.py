@@ -20,26 +20,6 @@ def load_tables(ann_path: str, img_index_path: str):
 
 
 
-# def export_overlays(current_q: pd.DataFrame, img_root: str, out_dir: Path, max_images: int = 40):
-#     out_dir.mkdir(parents=True, exist_ok=True)
-#     # One image per unique image id (limit)
-#     picks = (current_q[["image","split"]].drop_duplicates().head(max_images)).itertuples(index=False)
-#     saved = 0
-#     for img, sp in picks:
-#         rows = current_q[(current_q["image"] == img) & (current_q["split"] == sp)]
-#         image_path = Path(img_root) / sp / img
-#         if not image_path.exists():
-#             matches = list((Path(img_root) / sp).glob(f"**/{img}"))
-#             image_path = matches[0] if matches else None
-#         if not image_path or not image_path.exists():
-#             continue
-#         im = overlay_boxes(image_path, rows, max_boxes=200)
-#         im.save(out_dir / f"{sp}__{img.replace('/', '_')}")
-#         saved += 1
-#     return saved
-
-
-
 def export_overlays(current_q: pd.DataFrame, img_root: str, out_dir: Path, max_images: int = 40):
     out_dir.mkdir(parents=True, exist_ok=True)
     picks = (current_q[["image","split"]].drop_duplicates().head(max_images)).itertuples(index=False)

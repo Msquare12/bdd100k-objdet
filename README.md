@@ -1,96 +1,131 @@
-# BDD100K — Object Detection (Data Analysis → Training → Evaluation)
+# BDD100K : Object Detection (EDA → Training → Evaluation)
 
-End-to-end project for BDD100K object detection:
-- **Part 1: Data Analysis (EDA)** — Streamlit dashboard in Docker
-- **Part 2: Model Training** — Object Detection training
-- **Part 3: Evaluation** — metrics + failure slices
+End-to-end project on BDD100K:
 
----
+* **Part 1: Data Analysis (EDA)** —> Streamlit dashboard (Dockerized)
+* **Part 2: Model Training** —> YOLOv8 training on BDD (subset + full-data)
+* **Part 3: Evaluation** —> metrics, slice analysis, and qualitative overlays
 
-## Quick Start: Data Analysis (Docker)
-
-Use the containerized dashboard; dataset is mounted from host.
-
-```bash
-# 1) edit dataset paths in docker-compose.yml (volumes section)
-# 2) build + run
-docker compose build eda
-docker compose up eda   # open http://localhost:8501
-# reuse parquet later:
-SKIP_INGEST=1 docker compose up eda
-````
-
-Full details: **docker/README.md**
-
-Data Analysis Insights Report: **reports/eda/INSIGHTS.md**
 
 ---
 
 ## Repository Layout
 
 ```
-docker/               # Dockerfile + entrypoint + usage
+docker/                      # Dockerfile + compose entrypoint for EDA
 requirements/
-  data.txt            # EDA dependencies
+  data.txt                   # EDA deps
+  model.txt                  # training/eval deps (torch, ultralytics etc)
 scripts/
-  run_data_ingest.sh  # JSON → parquet
-  run_streamlit.sh    # local Streamlit (non-Docker)
+  run_data_ingest.sh         # JSON → parquet
+  run_streamlit.sh           # local Streamlit
+  make_subset.py             # build YOLO subset (copy/symlink)
+  run_train_subset.sh        # 1-epoch sanity training
+  run_eval.sh                # save val predictions + plots
 src/
-  data/               # parsers, split analysis
-  vis/                # Streamlit app + exporters
+  data/
+    bdd_parser.py            # parses BDD JSON → parquet
+    analyze_splits.py        # split drift/ratios
+    export_yolo.py           # BDD → YOLO labels
+  eval/
+    match_eval.py            # slice metrics (tiny/occ/trunc)
+  vis/
+    streamlit_app.py         # EDA dashboard
+    overlay_pred_gt.py       # GT vs Pred overlays
+configs/
+  data_bdd_yolo.yaml         # YOLO data cfg (full)
+  data_bdd_yolo_subset.yaml  # YOLO data cfg (subset)
 reports/
   eda/
-    INSIGHTS.md       # analysis notes + figures
-    assets/           # screenshots/overlays used in the doc
-    insights/         # exported CSVs
+    INSIGHTS.md              # data analysis notes + figures
+    assets/, insights/       # screenshots & CSVs
+  model/
+    MODEL.md                 # model choice & reasoning
+    TRAINING.md              # how to train
+  eval/
+    EVAL.md                  # evaluation & visualization notes
+runs/                        # training/eval outputs (gitignored)
 ```
 
-(Heavy data is gitignored; mount via Compose.)
+*(Heavy data is gitignored; mount via Docker or use absolute paths.)*
 
 ---
 
-## Part 1 : Data Analysis (EDA)
+## Quick Start — Part 1: Data Analysis (Docker)
 
-* Dashboard: `src/vis/streamlit_app.py`
-* Figures/CSVs + write-up: `reports/eda/INSIGHTS.md`
-* How to reproduce figures: see the bottom of **INSIGHTS.md**
-
----
-
-## Part 2 : Model Training
-
-Planned files (to be added):
-
-* `requirements/model.txt` — torch/ultralytics deps
-* `configs/data.yaml`, `configs/yolo.yaml` — dataset & hyperparams
-* `scripts/run_train_subset.sh` — quick 1-epoch sanity run
-* `scripts/run_train.sh` — full training run
-* `reports/model/` — logs/checkpoints (gitignored)
-
-Expected usage:
+Use the containerized dashboard; dataset is mounted from host.
 
 ```bash
-# subset sanity (to be added)
-bash scripts/run_train_subset.sh
-# full training (to be added)
-bash scripts/run_train.sh
+# 1) Edit dataset paths in docker-compose.yml (volumes:)
+#    - point to .../bdd100k/images/100k and labels JSONs
+# 2) Build & run
+docker compose build eda
+docker compose up eda      # open http://localhost:8501
+
+# Reuse previously built parquet:
+SKIP_INGEST=1 docker compose up eda
 ```
+
+* Details: **docker/README.md**
+* My Insights write-up: **reports/eda/INSIGHTS.md**
+
 
 ---
 
-## Part 3 : Evaluation
+## Part 2 — Model Training (YOLOv8)
 
-Planned files (to be added):
+* Docs: **reports/model/MODEL.md** (Reason to choose & architecture etc), **reports/model/TRAINING.md** (how to train)
 
-* `scripts/run_eval.sh` — evaluation on val set
-* `src/eval/` — COCO metrics, PR curves, failure clustering
-* `reports/eval/` — metrics + qualitative outputs (gitignored)
-
-Expected usage:
+### Minimal workflow
 
 ```bash
-# evaluate last/best weights (to be added)
-bash scripts/run_eval.sh
+# 0) Env (CUDA 11.3 example)
+pip install -r requirements/model.txt
+
+# 1) Export BDD → YOLO (labels + image links)
+python -m src.data.export_yolo \
+  --ann reports/eda/annotations.parquet \
+  --out data/yolo_bdd \
+  --splits train val \
+  --img_root /ABS/PATH/to/bdd100k/images/100k
+
+# 2) Build subset and train 1 epoch (sanity)
+python scripts/make_subset.py --root data/yolo_bdd --out data/yolo_bdd_subset --train_k 2000 --val_k 500 --copy
+bash scripts/run_train_subset.sh    # uses yolov8s.pt, imgsz=1280, 1 epoch
+
+#Use 'run_train.sh' for full data training.
 ```
 
 ---
+
+## Part 3 — Evaluation & Visualization
+
+* Docs: **reports/eval/EVAL.md**
+
+```bash
+# 1) Save YOLO val predictions + plots
+bash scripts/run_eval.sh            # writes to runs/evaluate_subset/...
+
+# 2) Slice metrics (tiny/occluded/truncated), tied to EDA
+python -m src.eval.match_eval \
+  --ann reports/eda/annotations.parquet \
+  --pred_dir runs/evaluate_subset/labels \
+  --out_csv reports/eval/metrics_slices.csv \
+  --restrict_to_pred
+
+# 3) Qualitative overlays (GT vs Pred)
+python -m src.vis.overlay_pred_gt \
+  --ann reports/eda/annotations.parquet \
+  --img_root /ABS/PATH/to/bdd100k/images/100k \
+  --pred_dir runs/evaluate_subset/labels \
+  --out_dir reports/eval/qual --max_images 20 \
+  --restrict_to_pred --conf_min 0.25
+```
+
+---
+
+## Notes
+
+* EDA shows **tiny-object dominance** for `traffic light/sign`; evaluation tracks this via **AP\_small** and **small-object recall proxy**.
+* Use `imgsz 1280–1536`, `rect=True`, and NMS IoU 0.55–0.65 for tiny objects; see **TRAINING.md** and **EVAL.md** for exact flags.
+* All paths are configurable; prefer **absolute** paths for image roots when outside Docker.

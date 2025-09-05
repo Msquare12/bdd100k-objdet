@@ -1,0 +1,16 @@
+# for full training
+path: /media/hugeDrive1/Malyaj/SD_gujarati_OCR/adas_bdd/data/yolo_bdd
+train: images/train
+val: images/val
+
+names:
+  0: car
+  1: bus
+  2: truck
+  3: person
+  4: rider
+  5: bike
+  6: motor
+  7: traffic light
+  8: traffic sign
+  9: train

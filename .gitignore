@@ -4,20 +4,26 @@ __pycache__/
 *.pyc
 .venv/
 .env
+*.pt
+*.onnx
+*.engine
+.DS_Store
 
 # Local data (keep out of git)
 assignment_data_bdd/
 bdd100k_images_100k/
 bdd100k_labels_release/
+data/
+runs/
 
-# Generated heavy artifacts
+
+# Generated heavy artifacts - parquet caches
 reports/eda/annotations.parquet
 reports/eda/images_index.parquet
 reports/eda/exports/
 
 # model/eval outputs
-reports/model/
-reports/eval/
+reports/eval/quality_eval_samples
 runs/                 # ultralytics default
 weights/
 checkpoints/
